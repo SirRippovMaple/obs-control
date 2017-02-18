@@ -57,6 +57,7 @@
   <ItemGroup>
     <Compile Include="CommandLineOptions.cs" />
     <Compile Include="Message.cs" />
+    <Compile Include="SetSourceRenderMessage.cs" />
     <Compile Include="SwitchSceneMessage.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using Newtonsoft.Json;
 using WebSocketSharp;
 
@@ -16,7 +18,23 @@ namespace Trumpi.ObsControl
             using (var ws = new WebSocket("ws://localhost:4444"))
             {
                 ws.Connect();
+                ReplaySubject<dynamic> s = new ReplaySubject<dynamic>();
+                ws.OnMessage += (o, eventArgs) =>
+                {
+                    s.OnNext(JsonConvert.DeserializeObject(eventArgs.Data));
+                };
 
+                if (options.GetScene)
+                {
+                    var message = new GetSceneMessage();
+                    ws.Send(JsonConvert.SerializeObject(message));
+                    var result = s
+                        .FirstAsync(x => x["message-id"] == message.MessageId)
+                        .Timeout(TimeSpan.FromSeconds(5))
+                        .Wait();
+                    Console.WriteLine(result["name"]);
+                    Environment.SetEnvironmentVariable("ObsScene", (string) result["name"], EnvironmentVariableTarget.User);
+                }
                 if (!string.IsNullOrEmpty(options.SceneName))
                 {
                     var message = new SwitchSceneMessage {SceneName = options.SceneName};

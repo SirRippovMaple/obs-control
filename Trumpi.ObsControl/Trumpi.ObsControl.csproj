@@ -77,9 +77,12 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Animation.cs" />
     <Compile Include="CommandLineOptions.cs" />
     <Compile Include="GetSceneMessage.cs" />
     <Compile Include="Message.cs" />
+    <Compile Include="SetSceneItemPositionMessage.cs" />
+    <Compile Include="SetSceneItemTransform.cs" />
     <Compile Include="SetSourceRenderMessage.cs" />
     <Compile Include="SwitchSceneMessage.cs" />
     <Compile Include="Program.cs" />

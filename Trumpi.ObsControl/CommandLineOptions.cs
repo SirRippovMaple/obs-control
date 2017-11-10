@@ -15,5 +15,8 @@ namespace Trumpi.ObsControl
 
         [ValueArgument(typeof(string), 'h', "hide")]
         public string HideSource { get; set; }
+
+        [ValueArgument(typeof(string), 'a', "animate")]
+        public string Animate { get; set; }
     }
 }

@@ -93,6 +93,14 @@ namespace Trumpi.ObsControl
                     var message = new SetSourceRenderMessage {Source = options.HideSource, Render = false};
                     ws.Send(JsonConvert.SerializeObject(message));
                 }
+                if (!string.IsNullOrEmpty(options.Transition))
+                {
+                    var components = options.Transition.Split(';');
+                    var transitionMessage = new SetTransitionMessage {TransitionName = components[0]};
+                    ws.Send(JsonConvert.SerializeObject(transitionMessage));
+                    var transitionDurationMessage = new SetTransitionDuration {Duration = int.Parse(components[1])};
+                    ws.Send(JsonConvert.SerializeObject(transitionDurationMessage));
+                }
             }
         }
 

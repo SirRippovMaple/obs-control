@@ -84,6 +84,8 @@
     <Compile Include="SetSceneItemPositionMessage.cs" />
     <Compile Include="SetSceneItemTransform.cs" />
     <Compile Include="SetSourceRenderMessage.cs" />
+    <Compile Include="SetTransitionDuration.cs" />
+    <Compile Include="SetTransitionMessage.cs" />
     <Compile Include="SwitchSceneMessage.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -18,5 +18,8 @@ namespace Trumpi.ObsControl
 
         [ValueArgument(typeof(string), 'a', "animate")]
         public string Animate { get; set; }
+
+        [ValueArgument(typeof(string), 't', "transition")]
+        public string Transition { get; set; }
     }
 }

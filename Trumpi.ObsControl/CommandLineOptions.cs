@@ -4,6 +4,9 @@ namespace Trumpi.ObsControl
 {
     public class CommandLineOptions
     {
+        [SwitchArgument('d', "daemon", false)]
+        public bool Daemon { get; set; }
+
         [SwitchArgument('g', "getscene", false)]
         public bool GetScene { get; set; }
 

@@ -78,22 +78,22 @@ namespace Trumpi.ObsControl
                     Console.WriteLine(result["name"]);
                     Environment.SetEnvironmentVariable("ObsScene", (string) result["name"], EnvironmentVariableTarget.User);
                 }
-                if (!string.IsNullOrEmpty(options.SceneName))
+                else if (!string.IsNullOrEmpty(options.ShowSource))
+                {
+                    var message = new SetSourceRenderMessage {Source = options.ShowSource, Render = true, SceneName = options.SceneName };
+                    ws.Send(JsonConvert.SerializeObject(message));
+                }
+                else if (!string.IsNullOrEmpty(options.HideSource))
+                {
+                    var message = new SetSourceRenderMessage {Source = options.HideSource, Render = false, SceneName = options.SceneName };
+                    ws.Send(JsonConvert.SerializeObject(message));
+                }
+                else if (!string.IsNullOrEmpty(options.SceneName))
                 {
                     var message = new SwitchSceneMessage {SceneName = options.SceneName};
                     ws.Send(JsonConvert.SerializeObject(message));
                 }
-                if (!string.IsNullOrEmpty(options.ShowSource))
-                {
-                    var message = new SetSourceRenderMessage {Source = options.ShowSource, Render = true};
-                    ws.Send(JsonConvert.SerializeObject(message));
-                }
-                if (!string.IsNullOrEmpty(options.HideSource))
-                {
-                    var message = new SetSourceRenderMessage {Source = options.HideSource, Render = false};
-                    ws.Send(JsonConvert.SerializeObject(message));
-                }
-                if (!string.IsNullOrEmpty(options.Transition))
+                else if (!string.IsNullOrEmpty(options.Transition))
                 {
                     var components = options.Transition.Split(';');
                     var transitionMessage = new SetTransitionMessage {TransitionName = components[0]};

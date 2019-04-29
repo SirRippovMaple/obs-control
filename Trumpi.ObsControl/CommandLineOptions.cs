@@ -4,9 +4,6 @@ namespace Trumpi.ObsControl
 {
     public class CommandLineOptions
     {
-        [SwitchArgument('d', "daemon", false)]
-        public bool Daemon { get; set; }
-
         [SwitchArgument('g', "getscene", false)]
         public bool GetScene { get; set; }
 
@@ -24,5 +21,17 @@ namespace Trumpi.ObsControl
 
         [ValueArgument(typeof(string), 't', "transition")]
         public string Transition { get; set; }
+
+        [ValueArgument(typeof(string), 'f', "setflag", AllowMultiple = true)]
+        public string[] SetFlag { get; set; }
+
+        [ValueArgument(typeof(string), 'x', "unsetflag", AllowMultiple = true)]
+        public string[] UnsetFlag { get; set; }
+
+        [ValueArgument(typeof(string), 'i', "ifflag", AllowMultiple = true)]
+        public string[] IfFlag { get; set; }
+
+        [ValueArgument(typeof(string), 'j', "ifnotflag", AllowMultiple = true)]
+        public string[] IfNotFlag { get; set; }
     }
 }

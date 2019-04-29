@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
@@ -11,23 +12,50 @@ namespace Trumpi.ObsControl
 {
     public class ObsAction : IDisposable
     {
-        private readonly WebSocket ws = new WebSocket("ws://localhost:4444");
-        private readonly ReplaySubject<dynamic> s = new ReplaySubject<dynamic>();
+        private readonly WebSocket _ws = new WebSocket("ws://localhost:4444");
+        private readonly ReplaySubject<dynamic> _s = new ReplaySubject<dynamic>();
+        private readonly Dictionary<string, bool> _flags = new Dictionary<string, bool>();
 
         public void Connect()
         {
-            ws.Connect();
-            ws.OnMessage += (o, eventArgs) =>
+            _ws.Connect();
+            _ws.OnMessage += (o, eventArgs) =>
             {
-                s.OnNext(JsonConvert.DeserializeObject(eventArgs.Data));
+                _s.OnNext(JsonConvert.DeserializeObject(eventArgs.Data));
             };
         }
 
         public void DoAction(CommandLineOptions options)
         {
-            if (!ws.IsAlive)
+            if (!_ws.IsAlive)
             {
-                ws.Connect();
+                _ws.Connect();
+            }
+
+            foreach (var flagName in options.SetFlag)
+            {
+                _flags[flagName] = true;
+            }
+
+            foreach (var flagName in options.UnsetFlag)
+            {
+                _flags[flagName] = false;
+            }
+
+            foreach (var flagName in options.IfFlag)
+            {
+                if (!_flags.ContainsKey(flagName) || _flags[flagName] == false)
+                {
+                    return;
+                }
+            }
+
+            foreach (var flagName in options.IfNotFlag)
+            {
+                if (_flags.ContainsKey(flagName) && _flags[flagName])
+                {
+                    return;
+                }
             }
 
             if (!string.IsNullOrEmpty(options.Animate))
@@ -66,8 +94,8 @@ namespace Trumpi.ObsControl
                             XScale = currentXScale
                         };
 
-                        ws.Send(JsonConvert.SerializeObject(message));
-                        ws.Send(JsonConvert.SerializeObject(transformMessage));
+                        _ws.Send(JsonConvert.SerializeObject(message));
+                        _ws.Send(JsonConvert.SerializeObject(transformMessage));
                     }
                     Thread.Sleep(1000 / 60);
                 } while (percentage < 1);
@@ -76,33 +104,33 @@ namespace Trumpi.ObsControl
             if (options.GetScene)
             {
                 var message = new GetSceneMessage();
-                ws.Send(JsonConvert.SerializeObject(message));
-                var result = WaitForResponse(s, message);
+                _ws.Send(JsonConvert.SerializeObject(message));
+                var result = WaitForResponse(_s, message);
                 Console.WriteLine(result["name"]);
                 Environment.SetEnvironmentVariable("ObsScene", (string)result["name"], EnvironmentVariableTarget.User);
             }
             else if (!string.IsNullOrEmpty(options.ShowSource))
             {
                 var message = new SetSourceRenderMessage { Source = options.ShowSource, Render = true, SceneName = options.SceneName };
-                ws.Send(JsonConvert.SerializeObject(message));
+                _ws.Send(JsonConvert.SerializeObject(message));
             }
             else if (!string.IsNullOrEmpty(options.HideSource))
             {
                 var message = new SetSourceRenderMessage { Source = options.HideSource, Render = false, SceneName = options.SceneName };
-                ws.Send(JsonConvert.SerializeObject(message));
+                _ws.Send(JsonConvert.SerializeObject(message));
             }
             else if (!string.IsNullOrEmpty(options.SceneName))
             {
                 var message = new SwitchSceneMessage { SceneName = options.SceneName };
-                ws.Send(JsonConvert.SerializeObject(message));
+                _ws.Send(JsonConvert.SerializeObject(message));
             }
             else if (!string.IsNullOrEmpty(options.Transition))
             {
                 var components = options.Transition.Split(';');
                 var transitionMessage = new SetTransitionMessage { TransitionName = components[0] };
-                ws.Send(JsonConvert.SerializeObject(transitionMessage));
+                _ws.Send(JsonConvert.SerializeObject(transitionMessage));
                 var transitionDurationMessage = new SetTransitionDuration { Duration = int.Parse(components[1]) };
-                ws.Send(JsonConvert.SerializeObject(transitionDurationMessage));
+                _ws.Send(JsonConvert.SerializeObject(transitionDurationMessage));
             }
         }
 
@@ -117,8 +145,8 @@ namespace Trumpi.ObsControl
 
         public void Dispose()
         {
-            ((IDisposable) ws)?.Dispose();
-            s?.Dispose();
+            ((IDisposable) _ws)?.Dispose();
+            _s?.Dispose();
         }
     }
 }
